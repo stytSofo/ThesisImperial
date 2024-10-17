@@ -1,0 +1,18 @@
+
+Produces LLVM IR and only compiles to an object file
+clang-14 -flegacy-pass-manager -S -emit-llvm  -c -Xclang -load -Xclang ../LLVM/Pass2/libModifyLoadAddrsPass.so red.c -march=armv8.5a+memtag
+clang-14 -flegacy-pass-manager -emit-llvm  -c -Xclang -load -Xclang ../LLVM/Pass2/libModifyLoadAddrsPass.so red.c -march=armv8.5a+memtag
+clang-14 -flegacy-pass-manager -S -emit-llvm  -c -Xclang -load -Xclang ../LLVM/Pass2/libModifyLoadAddrsPass.so blue.c -march=armv8.5a+memtag
+clang-14 -flegacy-pass-manager -emit-llvm  -c -Xclang -load -Xclang ../LLVM/Pass2/libModifyLoadAddrsPass.so blue.c -march=armv8.5a+memtag
+
+Load + Store Pass
+clang-14 -flegacy-pass-manager -c -Xclang -load -Xclang ../LLVM/Pass3/libModifyLoadStoreAddrsPass.so -Xclang -mllvm -Xclang -tag-value=3 -march=armv8.5a+memtag red.c
+clang-14 -flegacy-pass-manager -S -Xclang -load -Xclang ../LLVM/Pass3/libModifyLoadStoreAddrsPass.so -Xclang -mllvm -Xclang -tag-value=3 -march=armv8.5a+memtag red.c
+clang-14 -flegacy-pass-manager -S -emit-llvm  -c -Xclang -load -Xclang ../LLVM/Pass3/libModifyLoadStoreAddrsPass.so blue.c -march=armv8.5a+memtag
+clang-14 -flegacy-pass-manager -c -Xclang -load -Xclang ../LLVM/Pass3/libModifyLoadStoreAddrsPass.so -Xclang -mllvm -Xclang -tag-value=5 -march=armv8.5a+memtag blue.c
+clang-14 -flegacy-pass-manager -c -Xclang -load -Xclang ../LLVM/Pass3/libModifyLoadStoreAddrsPass.so -tag-value=5 blue.c -march=armv8.5a+memtag
+clang-14 -o pass_mte_full safe.o mte_example.c -march=armv8.5a+memtag
+
+
+Compile everything together
+clang-14 -o demo -O0 red.o blue.o mte.c main.c -march=armv8.5a+memtag -target aarch64
